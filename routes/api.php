@@ -16,5 +16,5 @@ use Illuminate\Http\Request;
 Route::get('/', function() {
     return response()->json(['message' => 'Atlanta API', 'status' => 'Connected']);
 });
-
-Route::get('/login', 'UserController@login');
+Route::post('/register', 'UserController@store');
+Route::post('/login', 'UserController@login');
