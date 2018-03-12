@@ -12,5 +12,5 @@
 */
 
 Route::get('/', function () {
-    Redirect('/api');
+    return redirect('api');
 });

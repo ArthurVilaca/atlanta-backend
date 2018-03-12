@@ -13,6 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/api', function() {
+Route::get('/', function() {
     return response()->json(['message' => 'Atlanta API', 'status' => 'Connected']);
 });
