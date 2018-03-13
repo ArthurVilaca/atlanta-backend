@@ -18,8 +18,12 @@ Route::get('/', function() {
 });
 
 Route::group(['middleware' => 'jwt.auth'], function () {
-    Route::get('/user', 'UserController@index');
+    //Rotas de usuario
+    Route::resource('user', 'UserController', ['except' => [
+        'store'
+    ]]);
 });
 
 Route::post('/register', 'UserController@store');
 Route::post('/login', 'UserController@login');
+

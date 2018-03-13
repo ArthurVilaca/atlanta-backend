@@ -4,6 +4,7 @@ namespace App\Response;
 class Response
 {
     private $messages;
+    private $type;
     private $dataset;
 
     public function __construct() 
@@ -36,7 +37,7 @@ class Response
      */
     public function setDataSet($name, $data)
     {
-        $this->dataSet[] = [$name => $data];
+        $this->dataSet[$name] = $data;
     }
 
     /**
@@ -48,6 +49,24 @@ class Response
         return $this->dataSet;
     }
 
+    /**
+     * Set type message (S or N)
+     * @param $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * Method get type message
+     * @return string $type
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
      /**
      * Function to converte a object with options
      * @return object $data
@@ -55,15 +74,15 @@ class Response
     public function toString()
     {   
         $data = [];    
-        $messages = $this->getMessages();
 
-        $data['message']['text'] = $messages;
-        $data['message']['type'] = "S";
+        $data['message']['text'] = $this->getMessages();
+        $data['message']['type'] = $this->getType();
         
-        if ($this->getDataset() != "")
+        foreach ($this->getDataset() as $key => $value)
         {
-            $data['dataset'] = $this->getDataset();
+            $data['dataset'][$key] = $value;
         }
+        
 
         return $data;        
     }

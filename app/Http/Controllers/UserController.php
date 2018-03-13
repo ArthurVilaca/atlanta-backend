@@ -27,7 +27,8 @@ class UserController extends Controller
     {
          $users = User::get();
 
-        $this->response->setDataSet("user", $users);
+        $this->response->setDataSet("users", $users);
+        $this->response->setType("S");
         $this->response->setMessages("Sucess!");
 
         return response()->json($this->response->toString());
@@ -53,13 +54,15 @@ class UserController extends Controller
         {
             return response()->json(['failed_to_create_token'], 500);
         }
+
+        $this->response->setType("S");
         $this->response->setDataSet("token", $token);
         $this->response->setMessages("Login successfully!");
         
         $user = JWTAuth::toUser($token);        
         $this->response->setDataSet("name", $user->name);
 
-        return response()->json($this->response->toString());
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
@@ -68,9 +71,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
-        //
-    }
+    {    }
 
     /**
      * Store a newly created resource in storage.
@@ -86,11 +87,12 @@ class UserController extends Controller
             'name' => $request->get('name'),
             'password' => bcrypt($request->get('password'))
         ]);
-
+            
+        $this->response->setType("S");
         $this->response->setDataSet("user", $returnUser);
         $this->response->setMessages("Created user successfully!");
         
-        return response()->json($this->response->toString());
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
@@ -111,9 +113,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        //
-    }
+    {    }
 
     /**
      * Update the specified resource in storage.
@@ -124,7 +124,23 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $user = User::find($id);
+        
+        if(!$user) 
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Record not found!");
+
+            return response()->json($this->response->toString(), 404);
+        }
+
+        $user->fill($request->all());
+        $user->save();
+        $this->response->setType("S");
+        $this->response->setDataSet("user", $user);
+        $this->response->setMessages("Sucess, user updated!");
+
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
@@ -135,6 +151,16 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::find($id);
+
+        if(!$user) 
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Record not found!");
+
+            return response()->json($this->response->toString(), 404);
+        }
+
+        $user->delete();
     }
 }
