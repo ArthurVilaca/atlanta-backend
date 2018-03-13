@@ -5,11 +5,11 @@ class Response
 {
     private $messages;
     private $type;
-    private $dataset;
+    private $dataSet;
 
     public function __construct() 
     {  
-        $this->dataset = [];
+        $this->dataSet = [];
     }
 
     /**
@@ -78,12 +78,15 @@ class Response
         $data['message']['text'] = $this->getMessages();
         $data['message']['type'] = $this->getType();
         
-        foreach ($this->getDataset() as $key => $value)
+        $dataset = $this->getDataset();
+        if (count($dataset) > 0 )
         {
-            $data['dataset'][$key] = $value;
-        }
+            foreach ($dataset as $key => $value)
+            {
+                $data['dataset'][$key] = $value;
+            }
+        }       
         
-
         return $data;        
     }
 }
