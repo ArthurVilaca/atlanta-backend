@@ -25,7 +25,41 @@ class UserController extends Controller
      */
     public function index()
     {
-        return response()->json(['status' => "OK"]);
+         $users = User::get();
+
+        $this->response->setDataSet("user", $users);
+        $this->response->setMessages("Sucess!");
+
+        return response()->json($this->response->toString());
+    }
+
+    /**
+     * Login user
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function login(Request $request)
+    {
+        $credentials = $request->only('username', 'password');
+        $token = null;
+        try 
+        {
+           if (!$token = JWTAuth::attempt($credentials)) 
+           {
+                return response()->json(['invalid_username_or_password'], 422);
+           }
+        } 
+        catch (JWTAuthException $e) 
+        {
+            return response()->json(['failed_to_create_token'], 500);
+        }
+        $this->response->setDataSet("token", $token);
+        $this->response->setMessages("Login successfully!");
+        
+        $user = JWTAuth::toUser($token);        
+        $this->response->setDataSet("name", $user->name);
+
+        return response()->json($this->response->toString());
     }
 
     /**
@@ -53,7 +87,7 @@ class UserController extends Controller
             'password' => bcrypt($request->get('password'))
         ]);
 
-        $this->response->setDataSet($returnUser);
+        $this->response->setDataSet("user", $returnUser);
         $this->response->setMessages("Created user successfully!");
         
         return response()->json($this->response->toString());

@@ -7,10 +7,12 @@ class Response
     private $dataset;
 
     public function __construct() 
-    {    }
+    {  
+        $this->dataset = [];
+    }
 
     /**
-     * Setter for options messages to response object
+     * Set for options messages to response object
      * @param string $data message
      */
     public function setMessages($message)
@@ -19,7 +21,7 @@ class Response
     }
 
     /**
-     * get for options messages to response object
+     * gGet for options messages to response object
      * @return string $data message
      */
     public function getMessages()
@@ -29,11 +31,12 @@ class Response
 
     /**
      * Method Set for data options with object content
+     * @param string $name name to index
      * @param object $data 
      */
-    public function setDataSet($data)
+    public function setDataSet($name, $data)
     {
-        $this->dataSet = $data;
+        $this->dataSet[] = [$name => $data];
     }
 
     /**

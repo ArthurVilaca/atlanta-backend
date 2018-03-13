@@ -15,9 +15,22 @@ class VerifyJWTToken
      */
     public function handle($request, Closure $next)
     {
+        /**
+         * Gambiarra a ser modificada
+         * Valida o token vindo do header ou pela url
+         */        
+        if (isset($_SERVER['HTTP_TOKEN']))
+        {
+            $token = $_SERVER['HTTP_TOKEN'];
+        }
+        else 
+        {
+            $token = $request->input('token');
+        }
+
         try
         {
-            $user = JWTAuth::toUser($request->input('token'));
+            $user = JWTAuth::toUser($token);
         }
         catch (JWTException $e) 
         {
