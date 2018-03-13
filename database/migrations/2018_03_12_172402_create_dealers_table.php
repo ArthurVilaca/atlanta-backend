@@ -15,7 +15,7 @@ class CreateDealersTable extends Migration
     {
         Schema::create('dealers', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('registration_token');
+            $table->string('registration_token')->nullable();;
             $table->timestamps();
         });
     }

@@ -1,5 +1,4 @@
 <?php 
-
 namespace App\Response;
 
 class Response
@@ -44,6 +43,26 @@ class Response
     public function getDataset()
     {
         return $this->dataSet;
+    }
+
+     /**
+     * Function to converte a object with options
+     * @return object $data
+     */
+    public function toString()
+    {   
+        $data = [];    
+        $messages = $this->getMessages();
+
+        $data['message']['text'] = $messages;
+        $data['message']['type'] = "S";
+        
+        if ($this->getDataset() != "")
+        {
+            $data['dataset'] = $this->getDataset();
+        }
+
+        return $data;        
     }
 }
 ?>

@@ -3,9 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use JWTAuth;
+use App\User;
+use JWTAuthException;
+use \App\Response\Response;
 
 class UserController extends Controller
 {
+    private $user;
+    private $response;
+    
+    public function __construct()
+    {
+        $this->user = new User();
+        $this->response = new Response();
+    }
     /**
      * Display a listing of the resource.
      *
@@ -13,7 +25,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json(['status' => "OK"]);
     }
 
     /**
@@ -34,7 +46,17 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //echo $request->get('username'); die();
+        $returnUser = $this->user->create([
+            'username' => $request->get('username'),
+            'name' => $request->get('name'),
+            'password' => bcrypt($request->get('password'))
+        ]);
+
+        $this->response->setDataSet($returnUser);
+        $this->response->setMessages("Created user successfully!");
+        
+        return response()->json($this->response->toString());
     }
 
     /**

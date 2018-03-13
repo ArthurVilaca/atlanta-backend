@@ -16,8 +16,8 @@ class CreateClientsTable extends Migration
         Schema::create('clients', function (Blueprint $table) {
             $table->increments('id');
             $table->string('registration_token');
-            $table->string('company_branch');
-            $table->enum('sale_plan', ['basic', 'top', 'premium']);
+            $table->string('company_branch')->nullable();;
+            $table->enum('sale_plan', ['basic', 'top', 'premium'])->nullable();;
             $table->timestamps();
         });
     }
