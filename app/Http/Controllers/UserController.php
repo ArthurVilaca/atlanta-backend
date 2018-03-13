@@ -47,12 +47,16 @@ class UserController extends Controller
         {
            if (!$token = JWTAuth::attempt($credentials)) 
            {
-                return response()->json(['invalid_username_or_password'], 422);
+               $this->response->setType("N");
+               $this->response->setMessages("invalid_username_or_password");
+               return response()->json($this->response->toString(), 422);
            }
         } 
         catch (JWTAuthException $e) 
         {
-            return response()->json(['failed_to_create_token'], 500);
+            $this->response->setType("N");
+            $this->response->setMessages("failed_to_create_token");
+            return response()->json($this->response->toString(), 500);
         }
 
         $this->response->setType("S");
