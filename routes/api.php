@@ -13,6 +13,17 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/api', function() {
+Route::get('/', function() {
     return response()->json(['message' => 'Atlanta API', 'status' => 'Connected']);
 });
+
+Route::group(['middleware' => 'jwt.auth'], function () {
+    //Rotas de usuario
+    Route::resource('user', 'UserController', ['except' => [
+        'store'
+    ]]);
+});
+
+Route::post('/register', 'UserController@store');
+Route::post('/login', 'UserController@login');
+
