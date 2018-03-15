@@ -33,7 +33,7 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
-        $user = $this->getAuthUser($request);
+        $user = $this->userService->getAuthUser($request);
 
         if($user->user_type == "U")
         {
@@ -70,7 +70,7 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
-        $userLogged = $this->getAuthUser($request);
+        $userLogged = $this->userService->getAuthUser($request);
         $userType = $userLogged->user_type;
         
         if ($userType == "D")
@@ -188,19 +188,5 @@ class ClientController extends Controller
 
         $client->delete();
         $user->delete();
-    }
-
-    private function getAuthUser(Request $request)
-    {
-        if (isset($_SERVER['HTTP_TOKEN']))
-        {
-            $user = JWTAuth::toUser($_SERVER['HTTP_TOKEN']);
-        }
-        else 
-        {
-            $user = JWTAuth::toUser($request->token);
-        }
-
-        return $user;
     }
 }

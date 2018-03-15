@@ -34,7 +34,7 @@ class DealerController extends Controller
      */
     public function index(Request $request)
     {
-        $user = $this->getAuthUser($request);
+        $user = $this->dealerService->getAuthUser($request);
 
         $dealer = $this->dealer->getDealerByUserId($user->id);
 
@@ -174,19 +174,5 @@ class DealerController extends Controller
 
         $dealer->delete();
         $user->delete();
-    }
-    
-    private function getAuthUser(Request $request)
-    {
-        if (isset($_SERVER['HTTP_TOKEN']))
-        {
-            $user = JWTAuth::toUser($_SERVER['HTTP_TOKEN']);
-        }
-        else 
-        {
-            $user = JWTAuth::toUser($request->token);
-        }
-
-        return $user;
-    }
+    }   
 }
