@@ -88,7 +88,6 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //echo $request->get('username'); die();
         $returnUser = $this->userService->create($request);
             
         $this->response->setType("S");
@@ -127,7 +126,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::find($id);
+        $user = $this->user->find($id);
         
         if(!$user) 
         {
@@ -154,7 +153,7 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::find($id);
+        $user = $this->user->find($id);
 
         if(!$user) 
         {

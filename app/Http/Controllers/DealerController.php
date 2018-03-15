@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use \App\Dealer;
-use \App\User;
 use JWTAuthException;
 use JWTAuth;
+use \App\Dealer;
 use \App\Response\Response;
 use \App\Service\UserService;
 use \App\Service\DealerService;
@@ -22,7 +21,6 @@ class DealerController extends Controller
     public function __construct()
     {
         $this->dealer = new Dealer();
-        $this->user = new User();
         $this->response = new Response();
         $this->dealerService = new DealerService();
         $this->userService = new UserService();
@@ -92,9 +90,7 @@ class DealerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        //
-    }
+    {    }
 
     /**
      * Update the specified resource in storage.

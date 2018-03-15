@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use JWTAuthException;
 use JWTAuth;
 use App\Client;
-use App\User;
 use \App\Response\Response;
 use \App\Service\UserService;
 use \App\Service\ClientService;
@@ -15,14 +14,12 @@ class ClientController extends Controller
 {
     private $client;
     private $response;
-    private $user;
     private $userService;
     private $clientService;
 
     public function __construct()
     {
         $this->client = new Client();
-        $this->user = new User();
         $this->response = new Response();
         $this->userService = new UserService();
         $this->clientService = new ClientService();
@@ -55,7 +52,6 @@ class ClientController extends Controller
     {
         $userLogged = $this->getAuthUser($request);
         $userType = $userLogged->user_type;
-        //var_dump($teste); die();
         
         if ($userType == "D")
         {
@@ -137,7 +133,6 @@ class ClientController extends Controller
             $user = JWTAuth::toUser($request->token);
         }
 
-        //var_dump($user); die();
         return $user;
     }
 }
