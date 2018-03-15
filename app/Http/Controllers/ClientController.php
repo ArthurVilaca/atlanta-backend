@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use JWTAuthException;
 use JWTAuth;
 use App\Client;
+use App\User;
 use \App\Response\Response;
 use \App\Service\UserService;
 use \App\Service\ClientService;
@@ -20,6 +21,7 @@ class ClientController extends Controller
     public function __construct()
     {
         $this->client = new Client();
+        $this->user = new User();
         $this->response = new Response();
         $this->userService = new UserService();
         $this->clientService = new ClientService();
@@ -85,7 +87,23 @@ class ClientController extends Controller
      */
     public function show($id)
     {
-        //
+        $client = $this->client->find($id);
+        $user = $this->user->find($client->user_id);
+
+        if(!$user) 
+        {
+            $this->response->settype("N");
+            $this->response->setMessages("Record not find!");
+
+            return response()->json($this->response->toString(), 404);
+        }
+
+        $this->response->setType("S");
+        $this->response->setDataSet("user", $user);
+        $this->response->setDataSet("client", $client);
+        $this->response->setMessages("Sucess, client updated!");
+
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
@@ -95,9 +113,7 @@ class ClientController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        //
-    }
+    {    }
 
     /**
      * Update the specified resource in storage.
@@ -108,7 +124,29 @@ class ClientController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $client = $this->client->find($id);
+        $user = $this->user->find($client->user_id);
+
+        if(!$user) 
+        {
+            $this->response->settype("N");
+            $this->response->setMessages("Record not find!");
+
+            return response()->json($this->response->toString(), 404);
+        }
+
+        $client->fill($request->all());
+        $client->save();
+
+        $user->fill($request->all());
+        $user->save();
+
+        $this->response->setType("S");
+        $this->response->setDataSet("user", $user);
+        $this->response->setDataSet("client", $client);
+        $this->response->setMessages("Sucess, client updated!");
+
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
@@ -119,7 +157,19 @@ class ClientController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $client = $this->client->find($id);
+        $user = $this->user->find($client->user_id);
+
+        if(!$user) 
+        {
+            $this->response->settype("N");
+            $this->response->setMessages("Record not find!");
+
+            return response()->json($this->response->toString(), 404);
+        }
+
+        $client->delete();
+        $user->delete();
     }
 
     public function getAuthUser(Request $request)

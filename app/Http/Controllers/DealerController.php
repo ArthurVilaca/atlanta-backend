@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use JWTAuthException;
 use JWTAuth;
 use \App\Dealer;
+use \App\User;
 use \App\Response\Response;
 use \App\Service\UserService;
 use \App\Service\DealerService;
@@ -21,13 +22,14 @@ class DealerController extends Controller
     public function __construct()
     {
         $this->dealer = new Dealer();
+        $this->user = new User();
         $this->response = new Response();
         $this->dealerService = new DealerService();
         $this->userService = new UserService();
     }
     /**
      * Display a listing of the resource.
-     *
+     * @param $request se neceesário o token 
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
@@ -40,7 +42,7 @@ class DealerController extends Controller
 
         $this->response->setType("S");
         $this->response->setDataSet("User", $user);
-        $this->response->setMessages("Created dealer successfully!");
+        $this->response->setMessages("Dealers search successfully!");
         
         return response()->json($this->response->toString(), 200);
     }
@@ -80,7 +82,32 @@ class DealerController extends Controller
      */
     public function show($id)
     {
-        //
+        $dealer = $this->dealer->find($id);
+        
+        if(!$dealer)
+        {
+            $this->response->settype("N");
+            $this->response->setMessages("Record not find!");
+
+            return response()->json($this->response->toString(), 404);
+        }
+
+        $user = $this->user->find($dealer->user_id);
+
+        if(!$user) 
+        {
+            $this->response->settype("N");
+            $this->response->setMessages("Record not find!");
+
+            return response()->json($this->respose->toString(), 404);
+        }
+
+        $this->response->setType("S");
+        $this->response->setDataSet("user", $user);
+        $this->response->setDataSet("dealer", $dealer);
+        $this->response->setMessages("Sucess, dealer updated!");
+
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
@@ -101,7 +128,29 @@ class DealerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $dealer = $this->dealer->find($id);
+        $user = $this->user->find($dealer->user_id);
+
+        if(!$user) 
+        {
+            $this->response->settype("N");
+            $this->response->setMessages("Record not find!");
+
+            return response()->json($this->response->toString(), 404);
+        }
+
+        $dealer->fill($request->all());
+        $dealer->save();
+
+        $user->fill($request->all());
+        $user->save();
+
+        $this->response->setType("S");
+        $this->response->setDataSet("user", $user);
+        $this->response->setDataSet("dealer", $dealer);
+        $this->response->setMessages("Sucess, dealer updated!");
+
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
@@ -112,7 +161,19 @@ class DealerController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $dealer = $this->dealer->find($id);
+        $user = $this->user->find($dealer->user_id);
+
+        if(!$user) 
+        {
+            $this->response->settype("N");
+            $this->response->setMessages("Record not find!");
+
+            return response()->json($this->response->toString(), 404);
+        }
+
+        $dealer->delete();
+        $user->delete();
     }
     
     private function getAuthUser(Request $request)
