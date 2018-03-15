@@ -15,12 +15,16 @@ class CreateClientsTable extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('registration_token');
+            $table->string('registration_code');
             $table->string('company_branch')->nullable();
             $table->enum('sale_plan', ['basic', 'top', 'premium'])->nullable();
             
             $table->integer('dealer_id')->unsigned();
             $table->foreign('dealer_id')->references('id')->on('dealers');
+
+            $table->integer('user_id')->unsigned();
+            $table->foreign('user_id')->references('id')->on('users');
+            
             $table->timestamps();
         });
     }

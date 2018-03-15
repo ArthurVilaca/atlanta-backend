@@ -7,16 +7,19 @@ use JWTAuth;
 use App\User;
 use JWTAuthException;
 use \App\Response\Response;
+use \App\Service\UserService;
 
 class UserController extends Controller
 {
     private $user;
+    private $userService;
     private $response;
     
     public function __construct()
     {
         $this->user = new User();
         $this->response = new Response();
+        $this->userService = new UserService();
     }
     /**
      * Display a listing of the resource.
@@ -25,7 +28,7 @@ class UserController extends Controller
      */
     public function index()
     {
-         $users = User::get();
+         $users = $this->user->get();
 
         $this->response->setDataSet("users", $users);
         $this->response->setType("S");
@@ -85,12 +88,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //echo $request->get('username'); die();
-        $returnUser = $this->user->create([
-            'username' => $request->get('username'),
-            'name' => $request->get('name'),
-            'password' => bcrypt($request->get('password'))
-        ]);
+        $returnUser = $this->userService->create($request);
             
         $this->response->setType("S");
         $this->response->setDataSet("user", $returnUser);
@@ -128,7 +126,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::find($id);
+        $user = $this->user->find($id);
         
         if(!$user) 
         {
@@ -155,7 +153,7 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::find($id);
+        $user = $this->user->find($id);
 
         if(!$user) 
         {
