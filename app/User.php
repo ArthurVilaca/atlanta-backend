@@ -15,7 +15,11 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'id', 'username', 'name', 'password', 'ip', 'token', 'expiration_date',
+        'id', 
+        'username', 
+        'name', 
+        'password', 
+        'user_type', 
     ];
 
     /**
@@ -26,4 +30,9 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 
     ];
+
+    public function dealer()
+    {
+        return $this->hasOne('App\Dealer', 'user_id', 'id');
+    }
 }

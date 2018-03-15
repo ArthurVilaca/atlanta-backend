@@ -3,24 +3,29 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use \App\Response\Response;
-use \App\Http\Controllers\UserController;
-use App\Client;
-use App\User;
 use JWTAuthException;
 use JWTAuth;
+use App\Client;
+use App\User;
+use \App\Response\Response;
+use \App\Service\UserService;
+use \App\Service\ClientService;
 
 class ClientController extends Controller
 {
     private $client;
     private $response;
     private $user;
-    
+    private $userService;
+    private $clientService;
+
     public function __construct()
     {
         $this->client = new Client();
         $this->user = new User();
         $this->response = new Response();
+        $this->userService = new UserService();
+        $this->clientService = new ClientService();
     }
     /**
      * Display a listing of the resource.
@@ -48,29 +53,32 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
-        $userID = $this->getAuthUser($request);
-        $dealerID = $this->client->getDealerId($userID);
-
-        $returnUser = $this->user->create([
-            'username' => $request->get('username'),
-            'name' => $request->get('name'),
-            'password' => bcrypt($request->get('password'))
-        ]);
-
-        $returnClient = $this->client->create([
-            'registration_code' => $request->get('registration_code'),
-            'company_branch' => $request->get('company_branch'),
-            'sale_plan' => $request->get('sale_plan'),
-            'user_id' => $userID,
-            'dealer_id' => $dealerID,
-        ]);
-
-        $this->response->setType("S");
-        $this->response->setDataSet("user", $returnUser);
-        $this->response->setDataSet("client", $returnClient);
-        $this->response->setMessages("Created user successfully!");
+        $userLogged = $this->getAuthUser($request);
+        $userType = $userLogged->user_type;
+        //var_dump($teste); die();
         
-        return response()->json($this->response->toString(), 200);
+        if ($userType == "D")
+        {
+            $dealerID = $this->client->getDealerId($userLogged->id);
+            $returnUser = $this->userService->create($request);
+    
+            $returnClient = $this->clientService->create($request, $returnUser->id, $dealerID);
+    
+            $this->response->setType("S");
+            $this->response->setDataSet("user", $returnUser);
+            $this->response->setDataSet("client", $returnClient);
+            $this->response->setMessages("Created user successfully!");
+
+            return response()->json($this->response->toString(), 200);
+        }
+        else 
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("You don't have permission to create a client.");
+            
+            return response()->json($this->response->toString(), 200);
+        }
+        
     }
 
     /**
@@ -130,6 +138,6 @@ class ClientController extends Controller
         }
 
         //var_dump($user); die();
-        return $user->id;
+        return $user;
     }
 }
