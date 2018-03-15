@@ -6,5 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Page extends Model
 {
-    protected $fillable = [];
+    protected $fillable = [
+        'name',
+        'url',
+        'status',
+        'client_id',
+        'file',
+    ];
 }

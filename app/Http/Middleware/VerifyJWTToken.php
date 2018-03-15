@@ -9,8 +9,7 @@ use \App\Response\Response;
 class VerifyJWTToken
 {
     private $response;
-
-
+    
     /**
      * Handle an incoming request.
      *
@@ -60,5 +59,22 @@ class VerifyJWTToken
             }
         }
        return $next($request);
+    }
+
+     /**
+     * Metodo para saber o usuario logado
+     */
+    public function getAuthUser(Request $request)
+    {
+        if (isset($_SERVER['HTTP_TOKEN']))
+        {
+            $user = JWTAuth::toUser($_SERVER['HTTP_TOKEN']);
+        }
+        else 
+        {
+            $user = JWTAuth::toUser($request->token);
+        }
+
+        return $user;
     }
 }

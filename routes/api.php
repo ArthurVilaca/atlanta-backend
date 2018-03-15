@@ -24,6 +24,8 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     ]]);
     Route::resource('client', 'ClientController');
     Route::resource('dealer', 'DealerController');
+    Route::resource('page', 'PageController');
+    Route::resource('component', 'ComponentController');
 });
 
 Route::post('/register', 'UserController@store');
