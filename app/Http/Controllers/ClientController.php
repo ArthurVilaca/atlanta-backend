@@ -31,9 +31,27 @@ class ClientController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(['message' => 'Atlanta API', 'status' => 'Connected']);
+        $user = $this->getAuthUser($request);
+
+        if($user->user_type == "U")
+        {
+            $client = $this->client->get();
+        }
+        else if($user->user_type == "D")
+        {
+            $dealerID = $this->client->getDealerId($user->id);
+            $client = $this->client->getClientByDealer($dealerID);
+        }
+        
+        $user->client = $client;
+
+        $this->response->setType("S");
+        $this->response->setDataSet("User", $user);
+        $this->response->setMessages("Dealers search successfully!");
+        
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
@@ -172,7 +190,7 @@ class ClientController extends Controller
         $user->delete();
     }
 
-    public function getAuthUser(Request $request)
+    private function getAuthUser(Request $request)
     {
         if (isset($_SERVER['HTTP_TOKEN']))
         {

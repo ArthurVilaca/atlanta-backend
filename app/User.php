@@ -29,6 +29,9 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password', 
+        'ip',
+        'token',
+        'expiration_date',
     ];
 
     public function dealer()
