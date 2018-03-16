@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('password');
             $table->enum('user_type', ['U', 'D', 'C'])->nullable();
+            $table->enum('status', ['APPROVED', 'PENDING'])->default('PENDING');
             $table->string('token')->nullable();
             $table->dateTime('expiration_date')->nullable();
             $table->string('ip')->nullable();

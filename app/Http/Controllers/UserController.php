@@ -61,12 +61,20 @@ class UserController extends Controller
             $this->response->setMessages("failed_to_create_token");
             return response()->json($this->response->toString(), 500);
         }
+        
+        $user = JWTAuth::toUser($token);
+
+        if($user->status != "APPROVED")
+        {
+            $this->response->setType("N");    
+            $this->response->setMessages("You don't have permission to do login!");
+            return response()->json($this->response->toString(), 500);
+        }
 
         $this->response->setType("S");
         $this->response->setDataSet("token", $token);
         $this->response->setMessages("Login successfully!");
         
-        $user = JWTAuth::toUser($token);        
         $this->response->setDataSet("name", $user->name);
         $this->response->setDataSet("user_type", $user->user_type);
 

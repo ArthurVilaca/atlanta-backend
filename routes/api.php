@@ -22,12 +22,17 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::resource('user', 'UserController', ['except' => [
         'store'
     ]]);
+
+    //Rotas de cliente
     Route::resource('client', 'ClientController');
-    Route::resource('dealer', 'DealerController');
-    Route::resource('page', 'PageController');
-    Route::resource('component', 'ComponentController');
+    
+    //Rotas de revendedor
+    Route::resource('dealer', 'DealerController', ['except' => [
+        'store'
+    ]]);
 });
 
+Route::post('/dealer', 'DealerController@store');
 Route::post('/register', 'UserController@store');
 Route::post('/login', 'UserController@login');
 
