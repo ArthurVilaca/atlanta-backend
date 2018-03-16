@@ -5,16 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use \App\Page;
 use \App\Response\Response;
+use \App\Service\PageService;
+use \App\Service\ComponentService;
 
 class PageController extends Controller
 {
     private $response;
     private $page;
+    private $pageService;
+    private $componentService;
 
     public function __construct()
     {
         $this->response = new Response();
         $this->page = new Page();
+        $this->pageService = new PageService();
+        $this->componentService = new ComponentService();
     }
 
     /**
@@ -22,14 +28,24 @@ class PageController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $pages = $this->page->get();
+        $userLogged = $this->pageService->getAuthUser($request);
+        if($userLogged->user_type != "U")
+        {
+            $pages = $this->page->getPagesByIdUser($userLogged->id);      
+                  
+            $this->response->setDataSet("Page", $pages);
+            $this->response->setType("S");
+            $this->response->setMessages("Sucess!");
+        }
         
-        $this->response->setDataSet("Page", $pages);
-        $this->response->setType("S");
-        $this->response->setMessages("Sucess!");
-
+        else 
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Error!");
+        }
+        
         return response()->json($this->response->toString());
     }
 
@@ -39,9 +55,7 @@ class PageController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
-        //
-    }
+    {    }
 
     /**
      * Store a newly created resource in storage.
@@ -72,9 +86,7 @@ class PageController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        //
-    }
+    {    }
 
     /**
      * Update the specified resource in storage.
