@@ -30,6 +30,14 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::resource('dealer', 'DealerController', ['except' => [
         'store'
     ]]);
+
+    //Rotas para components
+    Route::resource('component', 'ComponentController');
+    //Rotas páginas
+    Route::resource('page', 'PageController');
+
+    //Rota para trazer o componente de uma única página
+    Route::get('page/{page}/components', 'PageController@componentsPage');
 });
 
 Route::post('/dealer', 'DealerController@store');
