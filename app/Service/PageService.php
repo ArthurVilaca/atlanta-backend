@@ -19,7 +19,7 @@ class PageService extends Service
         $this->componentPage = new ComponentPage();
     }
 
-    public function create(Request $request, $clientID, $componentID)
+    public function create(Request $request, $clientID)
     {
         $pageCreate = $this->page->create([
             'name' => $request->get('name'),
@@ -29,12 +29,15 @@ class PageService extends Service
             'client_id' => $clientID,
         ]);
 
+        return $pageCreate;
+    }
+
+    public function createComponentPage($componentID, $pageID)
+    {
         $componentPageCreate = $this->componentPage->create([
             'component_id' => $componentID,
-            'page_id' => $pageCreate->id
+            'page_id' => $pageID
         ]);
-
-        $componentPageCreate->page = $pageCreate;
 
         return $componentPageCreate;
     }

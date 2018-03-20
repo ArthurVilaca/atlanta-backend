@@ -41,8 +41,11 @@ class ClientController extends Controller
         }
         else if($user->user_type == "D")
         {
-            $dealerID = $this->client->getDealerId($user->id);
-            $client = $this->client->getClientByDealer($dealerID);
+            $dealer = $this->client->getDealerId($user->id);
+            if($dealer)
+            {
+                $client = $this->client->getClientByDealer($dealer->id);
+            }
         }
         
         $user->client = $client;
@@ -75,17 +78,25 @@ class ClientController extends Controller
         
         if ($userType == "D")
         {
-            $dealerID = $this->client->getDealerId($userLogged->id);
-            $returnUser = $this->userService->create($request);
+            $dealer = $this->client->getDealerId($userLogged->id);
+            if($dealer)
+            {
+                $returnUser = $this->userService->create($request);
+        
+                $returnClient = $this->clientService->create($request, $returnUser->id, $dealer->id);
+        
+                $this->response->setType("S");
+                $this->response->setDataSet("user", $returnUser);
+                $this->response->setDataSet("client", $returnClient);
+                $this->response->setMessages("Created user successfully!");
     
-            $returnClient = $this->clientService->create($request, $returnUser->id, $dealerID);
-    
-            $this->response->setType("S");
-            $this->response->setDataSet("user", $returnUser);
-            $this->response->setDataSet("client", $returnClient);
-            $this->response->setMessages("Created user successfully!");
-
-            return response()->json($this->response->toString(), 200);
+                return response()->json($this->response->toString(), 200);
+            }
+            else 
+            {
+                $this->response->setType("N");
+                $this->response->setMessages("Error.");
+            }
         }
         else 
         {

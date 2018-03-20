@@ -17,6 +17,10 @@ Route::get('/', function() {
     return response()->json(['message' => 'Atlanta API', 'status' => 'Connected']);
 });
 
+Route::post('/dealer', 'DealerController@store');
+Route::post('/register', 'UserController@store');
+Route::post('/login', 'UserController@login');
+
 Route::group(['middleware' => 'jwt.auth'], function () {
     //Rotas de usuario
     Route::resource('user', 'UserController', ['except' => [
@@ -38,9 +42,5 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 
     //Rota para trazer o componente de uma única página
     Route::get('page/{page}/components', 'PageController@componentsPage');
+    Route::post('page/{page}/components', 'PageController@storeComponentPage');
 });
-
-Route::post('/dealer', 'DealerController@store');
-Route::post('/register', 'UserController@store');
-Route::post('/login', 'UserController@login');
-

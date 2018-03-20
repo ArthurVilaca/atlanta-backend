@@ -15,7 +15,7 @@ class CreateConfigComponentsTable extends Migration
     {
         Schema::create('config_components', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
+            $table->string('name_config');
             $table->string('text1')->nullable();
             $table->string('text2')->nullable();
             $table->string('text3')->nullable();

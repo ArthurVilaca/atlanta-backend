@@ -43,12 +43,6 @@ class PageController extends Controller
             $client = $this->client->getClientByUser($userLogged->id);
             $pages = $this->page->getPagesByIdUser($client->id);      
             
-            foreach ($pages as $page) 
-            {
-                $page->component = $this->page->getComponentsPages($page->id);
-                $page->component->configs = $this->page->getConfigComponentPage($page->component->id);
-            }
-
             $this->response->setDataSet("Page", $pages);
             $this->response->setType("S");
             $this->response->setMessages("Sucess!");
@@ -79,14 +73,22 @@ class PageController extends Controller
      */
     public function store(Request $request)
     {
-        $userLogged = $this->pageService->getAuthUser($request);
-        if($userLogged->user_type == "C")
+        if ($request->get('client_id'))
         {
+            $clientID = $request->get('client_id');
+        }
+        else
+        {
+            $userLogged = $this->pageService->getAuthUser($request);
             $client = $this->client->getClientByUser($userLogged->id);
-            //var_dump($client); die();
+            $clientID = $client->id;
+        }
+        
+        if($clientID != "" || $userLogged->user_type != "D")
+        {
             if($client)
             {
-                $pageCreate = $this->pageService->create($request, $client->id, 1);
+                $pageCreate = $this->pageService->create($request, $clientID);
         
                 $this->response->setDataSet("Page", $pageCreate);
                 $this->response->setType("S");
@@ -139,7 +141,7 @@ class PageController extends Controller
             $this->response->setMessages("User don't have permission!");
         }
         
-        return response()->json($this->response->toString(), 404);
+        return response()->json($this->response->toString());
     }
 
     /**
@@ -173,7 +175,32 @@ class PageController extends Controller
             $this->response->setMessages("User don't have permission!");
         }
 
-        return response()->json($this->response->toString(), 404);
+        return response()->json($this->response->toString());
+    }
+
+    /**
+     * 
+     */
+    public function storeComponentPage(Request $request, $id)
+    {
+        $pages = $this->page->find($id);
+        if(!$pages)
+        {
+            $this->response->settype("N");
+            $this->response->setMessages("Page not found.");
+            return response()->json($this->response->toString(), 404);
+        }
+
+        $createComponent = $this->componentService->createComponent($request);
+        $createPageComponent = $this->componentService->createConfigComponent($request, $createComponent->id);
+
+        $createPageComponent = $this->pageService->createComponentPage($createComponent->id, $id);
+
+        $this->response->settype("S");
+        $this->response->setMessages("Page component created!");
+        $this->response->setDataSet("PageComponent", $createPageComponent);
+
+        return response()->json($this->response->toString());
     }
 
     /**

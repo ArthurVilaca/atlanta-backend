@@ -29,7 +29,7 @@ class ComponentService extends Service
     public function createConfigComponent(Request $request, $componentId)
     {
         $configComponentCreate = $this->configComponent->create([
-            'name' => $request->get('nameConfig'),
+            'name_config' => $request->get('name_config'),
             'text1' => $request->get('text1'),
             'text2' => $request->get('text2'),
             'text3' => $request->get('text3'),

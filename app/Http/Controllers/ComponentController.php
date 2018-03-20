@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use JWTAuth;
 use JWTAuthException;
 use \App\Component;
+use \App\ComponentPage;
 use \App\ConfigComponent;
 use \App\Response\Response;
 use \App\Service\ComponentService;
@@ -14,6 +15,7 @@ class ComponentController extends Controller
 {
     private $response;
     private $component;
+    private $componentPage;
     private $configComponent;
     private $componentService;
 
@@ -21,6 +23,7 @@ class ComponentController extends Controller
     {
         $this->response = new Response();
         $this->component = new Component();
+        $this->componentPage = new ComponentPage();
         $this->configComponent = new ConfigComponent();
         $this->componentService = new ComponentService();
     }
@@ -89,7 +92,27 @@ class ComponentController extends Controller
      */
     public function show($id)
     {
-        //
+        $getComponent = $this->component->find($id);
+
+        if(!$getComponent)
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Record not found!");
+
+            return response()->json($this->response->toString(), 404);
+        }
+
+        $getConfigComponent = $this->configComponent->getConfigComponentPage($getComponent->id);
+        if($getConfigComponent)
+        {
+            $getComponent->config = $getConfigComponent;
+        }
+
+        $this->response->setType("S");
+        $this->response->setDataSet("Component", $getComponent);
+        $this->response->setMessages("Sucess!");
+
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
@@ -99,9 +122,7 @@ class ComponentController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        //
-    }
+    {    }
 
     /**
      * Update the specified resource in storage.
@@ -112,17 +133,68 @@ class ComponentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $getComponent = $this->component->find($id);
+
+        if(!$getComponent)
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Record not found!");
+
+            return response()->json($this->response->toString(), 404);
+        }
+        $getComponent->fill($request->all());
+        $getComponent->save();
+
+        $getConfigComponent = $this->configComponent->getConfigComponentPage($getComponent->id);
+        if($getConfigComponent)
+        {
+            //Transformação em objeto do model
+            $getConfigComponent = $this->configComponent->find($getConfigComponent->id);
+            $getConfigComponent->fill($request->all());
+            $getConfigComponent->save();
+            $getComponent->config = $getConfigComponent;
+        }
+
+        $this->response->setType("S");
+        $this->response->setDataSet("Component", $getComponent);
+        $this->response->setMessages("Sucess, component updated!");
+
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
+     * Remove the specified resource from storage.     *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        //
+        $getComponent = $this->component->find($id);
+
+        if(!$getComponent) 
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Record not found!");
+
+            return response()->json($this->response->toString(), 404);
+        }
+
+        $getComponentPage = $this->componentPage->getPageComponent($getComponent->id);
+        if($getComponentPage)
+        {
+            //Transformação em objeto do model
+            $getComponentPage = $this->componentPage->find($getComponentPage->id);
+            $getComponentPage->delete();
+        }
+
+        $getConfigComponent = $this->configComponent->getConfigComponentPage($getComponent->id);
+        if($getConfigComponent)
+        {
+            //Transformação em objeto do model
+            $getConfigComponent = $this->configComponent->find($getConfigComponent->id);
+            $getConfigComponent->delete();  
+        }
+
+        $getComponent->delete();
     }
 }

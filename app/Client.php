@@ -18,7 +18,8 @@ class Client extends Model
     public function getDealerId($userID)
     {
         $dealer = DB::table('dealers')->where('user_id', $userID)->first();
-        return $dealer->id;
+        
+        return $dealer;
     }
 
     public function getClientByDealer($dealerID)
