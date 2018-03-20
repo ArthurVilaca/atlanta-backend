@@ -58,6 +58,29 @@ class PageController extends Controller
     }
 
     /**
+     * 
+     */
+    public function pageClients($id)
+    {
+        $clients = $this->client->find($id);
+
+        if(!$clients)
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("Client not found!");
+
+            return response()->json($this->response->toString(), 404);
+        }
+        $pages = $this->page->getPagesByIdUser($id);      
+            
+        $this->response->setDataSet("Page", $pages);
+        $this->response->setType("S");
+        $this->response->setMessages("Sucess!");
+
+        return response()->json($this->response->toString());
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
