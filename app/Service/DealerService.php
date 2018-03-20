@@ -4,7 +4,7 @@ namespace App\Service;
 use Illuminate\Http\Request;
 use App\Dealer;
 
-class DealerService
+class DealerService extends Service
 {
     private $dealer;
 

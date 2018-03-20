@@ -9,8 +9,7 @@ use \App\Response\Response;
 class VerifyJWTToken
 {
     private $response;
-
-
+    
     /**
      * Handle an incoming request.
      *

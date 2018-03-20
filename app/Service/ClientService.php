@@ -4,7 +4,7 @@ namespace App\Service;
 use Illuminate\Http\Request;
 use App\Client;
 
-class ClientService
+class ClientService extends Service
 {
     private $client;
 

@@ -3,7 +3,7 @@ namespace App\Service;
 use Illuminate\Http\Request;
 use App\User;
 
-class UserService
+class UserService extends Service
 {
     private $user;
 
