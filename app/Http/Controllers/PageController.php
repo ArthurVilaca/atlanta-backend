@@ -185,7 +185,9 @@ class PageController extends Controller
             else
             {
                 $component = $this->page->getComponentsPages($pages->id);
-                $component->configs = $this->page->getConfigComponentPage($component->id);
+                if($component) {
+                    $component->configs = $this->page->getConfigComponentPage($component->id);
+                }
                 $this->response->settype("S");
                 $this->response->setMessages("Sucess!");
                 $this->response->setDataSet("Component", $component);
