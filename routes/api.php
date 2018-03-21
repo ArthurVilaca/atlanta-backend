@@ -43,6 +43,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     //Rota para trazer o componente de uma única página
     Route::get('page/{page}/components', 'PageController@componentsPage');
     Route::post('page/{page}/components', 'PageController@storeComponentPage');
+    Route::put('page/{page}/components/{component}', 'PageController@updateComponentPage');
     
     //Rotas para buscar páginas de um client
     Route::get('page/client/{client_id}', 'PageController@pageClients');
