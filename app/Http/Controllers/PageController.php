@@ -8,6 +8,7 @@ use \App\Response\Response;
 use \App\Service\PageService;
 use \App\Service\ComponentService;
 use \App\Client;
+use App\ConfigComponent;
 
 class PageController extends Controller
 {
@@ -25,6 +26,7 @@ class PageController extends Controller
         $this->client = new Client();
         $this->pageService = new PageService();
         $this->page = new Page();
+        $this->configComponent = new ConfigComponent();
 
         $this->pageService = new PageService();
         $this->componentService = new ComponentService();
@@ -186,7 +188,9 @@ class PageController extends Controller
             {
                 $component = $this->page->getComponentsPages($pages->id);
                 if($component) {
-                    $component->configs = $this->page->getConfigComponentPage($component->id);
+                    foreach ($component as $key => $value) {
+                        $value->configs = $this->page->getConfigComponentPage($value->id);
+                    }
                 }
                 $this->response->settype("S");
                 $this->response->setMessages("Sucess!");
@@ -224,6 +228,31 @@ class PageController extends Controller
         $this->response->settype("S");
         $this->response->setMessages("Page component created!");
         $this->response->setDataSet("PageComponent", $createPageComponent);
+
+        return response()->json($this->response->toString());
+    }
+
+    /**
+     * 
+     */
+    public function updateComponentPage(Request $request, $id, $component_id)
+    {
+        $pages = $this->page->find($id);
+        if(!$pages)
+        {
+            $this->response->settype("N");
+            $this->response->setMessages("Page not found.");
+            return response()->json($this->response->toString(), 404);
+        }
+
+        $component = $this->configComponent->find($component_id);
+
+        $component->fill($request->all());
+        $component->save();
+
+        $this->response->settype("S");
+        $this->response->setMessages("Config updated!");
+        $this->response->setDataSet("Configs", $component);
 
         return response()->json($this->response->toString());
     }

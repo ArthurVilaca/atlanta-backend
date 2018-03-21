@@ -33,7 +33,7 @@ class Page extends Model
             ->leftJoin('component_pages', 'component_pages.component_id', '=', 'components.id')
             ->leftJoin('pages', 'component_pages.page_id', '=', 'pages.id')
             ->where('pages.id', $pageID)
-            ->first();
+            ->get();
                     
         return $component;
     }
