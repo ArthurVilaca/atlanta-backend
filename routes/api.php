@@ -29,7 +29,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 
     //Rotas de cliente
     Route::resource('client', 'ClientController');
-    
+
     //Rotas de revendedor
     Route::resource('dealer', 'DealerController', ['except' => [
         'store'
