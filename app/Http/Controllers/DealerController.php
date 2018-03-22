@@ -35,10 +35,11 @@ class DealerController extends Controller
     public function index(Request $request)
     {
         $user = $this->dealerService->getAuthUser($request);
-
-        $dealer = $this->dealer->getDealerByUserId($user->id);
-
-        $user->dealer = $dealer;
+        $dealers = $this->dealer->getAll();
+        foreach ($dealers as $key => $value) {
+            $value->user = $this->user->find($value->id);
+        }
+        $user->dealers = $dealers;
 
         $this->response->setType("S");
         $this->response->setDataSet("User", $user);

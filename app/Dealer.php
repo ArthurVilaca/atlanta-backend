@@ -22,4 +22,10 @@ class Dealer extends Model
 
         return $user;
     }
+
+    public function getAll()
+    {
+        $dealers = DB::table('dealers')->get();
+        return $dealers;
+    }
 }

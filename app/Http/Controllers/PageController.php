@@ -82,6 +82,45 @@ class PageController extends Controller
         return response()->json($this->response->toString());
     }
 
+    public function newPageClients(Request $request, $client_id)
+    {
+        if ($request->get('client_id'))
+        {
+            $client = $this->client->find($client_id);
+            $clientID = $request->get('client_id');
+        }
+        else
+        {
+            $userLogged = $this->pageService->getAuthUser($request);
+            $client = $this->client->find($client_id);
+            $clientID = $client->id;
+        }
+        
+        if($clientID != "" || $userLogged->user_type != "D")
+        {
+            if($client)
+            {
+                $pageCreate = $this->pageService->create($request, $clientID);
+        
+                $this->response->setDataSet("Page", $pageCreate);
+                $this->response->setType("S");
+                $this->response->setMessages("Page created!");
+            }
+            else 
+            {
+                $this->response->setType("N");
+                $this->response->setMessages("You dont't have permission to create a page!");
+            }
+        }
+        else 
+        {
+            $this->response->setType("N");
+            $this->response->setMessages("You dont't have permission to create a page!");
+        }
+
+        return response()->json($this->response->toString());
+    }
+
     /**
      * Show the form for creating a new resource.
      *
