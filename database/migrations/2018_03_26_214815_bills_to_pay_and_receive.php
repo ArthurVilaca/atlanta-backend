@@ -20,6 +20,7 @@ class BillsToPayAndReceive extends Migration
             $table->foreign('dealer_id')->references('id')->on('dealers');
 
             $table->double('amount');
+            $table->string('month_reference');
 
             $table->dateTime('issue_date');
             $table->dateTime('due_date');
@@ -35,11 +36,26 @@ class BillsToPayAndReceive extends Migration
             $table->foreign('client_id')->references('id')->on('clients');
 
             $table->double('amount');
+            $table->string('month_reference');
 
             $table->dateTime('issue_date');
             $table->dateTime('due_date');
             $table->dateTime('payment_date')->nullable();
+            $table->timestamps();
+        });
 
+        Schema::create('remittance', function (Blueprint $table) {
+            $table->increments('id');
+
+            $table->integer('client_id')->unsigned();
+            $table->foreign('client_id')->references('id')->on('clients');
+
+            $table->double('amount_total');
+            $table->string('month_reference');
+            $table->string('description');
+
+            $table->dateTime('due_date');
+            $table->dateTime('payment_date')->nullable();
             $table->timestamps();
         });
     }

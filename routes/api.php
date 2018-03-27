@@ -48,4 +48,10 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     //Rotas para buscar páginas de um client
     Route::get('page/client/{client_id}', 'PageController@pageClients');
     Route::post('page/client/{client_id}', 'PageController@newPageClients');
+
+    //Rotas para contas a pagar
+    Route::resource('billspay', 'BillspayController');
+
+    //Rotas para contas a receber
+    Route::resource('billsreceive', 'BillsreceiveController');
 });
