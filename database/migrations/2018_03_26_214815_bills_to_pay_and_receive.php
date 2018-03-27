@@ -13,7 +13,7 @@ class BillsToPayAndReceive extends Migration
      */
     public function up()
     {
-        Schema::create('billspay', function (Blueprint $table) {
+        Schema::create('billspays', function (Blueprint $table) {
             $table->increments('id');
 
             $table->integer('dealer_id')->unsigned();
@@ -29,7 +29,7 @@ class BillsToPayAndReceive extends Migration
             $table->timestamps();
         });
 
-        Schema::create('billsreceive', function (Blueprint $table) {
+        Schema::create('billsreceives', function (Blueprint $table) {
             $table->increments('id');
 
             $table->integer('client_id')->unsigned();
@@ -44,7 +44,7 @@ class BillsToPayAndReceive extends Migration
             $table->timestamps();
         });
 
-        Schema::create('remittance', function (Blueprint $table) {
+        Schema::create('remittances', function (Blueprint $table) {
             $table->increments('id');
 
             $table->integer('client_id')->unsigned();

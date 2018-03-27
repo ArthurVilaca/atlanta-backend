@@ -2,11 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Billspay;
 use Illuminate\Http\Request;
+use JWTAuthException;
+use JWTAuth;
+use App\Billspay;
+use App\Dealer;
+use \App\Response\Response;
 
 class BillspayController extends Controller
 {
+    private $dealer;
+    private $response;
+
+    public function __construct()
+    {
+        $this->billspay = new Billspay();
+        $this->dealer = new Dealer();
+        $this->response = new Response();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +28,15 @@ class BillspayController extends Controller
      */
     public function index()
     {
-        //
+        $billspays = $this->billspay->get();
+        foreach ($billspays as $key => $value) {
+            $value->dealer = $this->dealer->find($value->id);
+        }
+
+        $this->response->setType("S");
+        $this->response->setDataSet("billspays", $billspays);
+        $this->response->setMessages("Billspay search successfully!");
+        return response()->json($this->response->toString(), 200);
     }
 
     /**

@@ -2,11 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Billsreceive;
 use Illuminate\Http\Request;
+use JWTAuthException;
+use JWTAuth;
+use App\Billsreceive;
+use App\Client;
+use \App\Response\Response;
 
 class BillsreceiveController extends Controller
 {
+    private $client;
+    private $response;
+
+    public function __construct()
+    {
+        $this->billsreceive = new Billsreceive();
+        $this->client = new Client();
+        $this->response = new Response();
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +27,15 @@ class BillsreceiveController extends Controller
      */
     public function index()
     {
-        //
+        $billsreceives = $this->billsreceive->get();
+        foreach ($billsreceives as $key => $value) {
+            $value->client = $this->client->find($value->id);
+        }
+
+        $this->response->setType("S");
+        $this->response->setDataSet("billsreceives", $billsreceives);
+        $this->response->setMessages("Billsreceive search successfully!");
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
