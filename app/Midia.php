@@ -12,4 +12,10 @@ class Midia extends Model
         'url',
         'keyname'
     ];
+
+    public function getByClientId($clientId)
+    {
+        $midias = DB::table('midias')->where('client_id', $clientId)->get();
+        return $midias;
+    }
 }

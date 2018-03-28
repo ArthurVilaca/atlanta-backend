@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use \App\Response\Response;
 use App\Client;
 use App\Midia;
+use \App\Service\UserService;
+
 use Aws\S3\S3Client;
 use Aws\Credentials\Credentials;
 use Aws\S3\Exception\S3Exception;
@@ -15,12 +17,14 @@ class MidiaController extends Controller
     private $response;
     private $client;
     private $midia;
+    private $userService;
 
     public function __construct()
     {
         $this->response = new Response();
         $this->client = new Client();
         $this->midia = new Midia();
+        $this->userService = new UserService();
     }
 
     /**
@@ -30,7 +34,14 @@ class MidiaController extends Controller
      */
     public function index(Request $request)
     {
-        
+        $user = $this->userService->getAuthUser($request);
+        $client = $this->client->getClientByUser($user->id);
+        $midias = $this->midia->getByClientId($client->id);
+
+        $this->response->setType("S");
+        $this->response->setDataSet("midias", $midias);
+        $this->response->setMessages("Midias search successfully!");
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
@@ -49,6 +60,16 @@ class MidiaController extends Controller
      */
     public function store(Request $request)
     {
+        $user = $this->userService->getAuthUser($request);
+
+        if($request->hasFile('midia')) {
+            $file = $request->midia;
+        } else {
+            $this->response->setType("N");
+            $this->response->setMessages("Failed to create a midia!");
+            return response()->json($this->response->toString(), 200);
+        }
+
         $s3 = new S3Client([
             'version' => 'latest',
             'region'  => 'us-east-1',
@@ -58,9 +79,11 @@ class MidiaController extends Controller
               )
         ]);
 
+        $client = $this->client->getClientByUser($user->id);
+
         $bucket = 'midia-site2go';
-        $keyname = '1/robots.txt2';
-        $filepath = getcwd().'/robots.txt';
+        $keyname = $client->id . '/' . $file->getClientOriginalName();
+        $filepath = $file->getPathname();
 
         try {
             $result = $s3->putObject(array(
@@ -72,7 +95,7 @@ class MidiaController extends Controller
             ));
 
             $returnMidia = $this->midia->create([
-                'client_id' => 2,
+                'client_id' => $client->id,
                 'url' => $result['ObjectURL'],
                 'keyname' => $keyname
             ]);
