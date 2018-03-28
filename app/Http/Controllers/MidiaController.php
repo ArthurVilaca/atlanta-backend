@@ -4,18 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use \App\Response\Response;
-use \App\Client;
+use App\Client;
+use App\Midia;
 use Aws\S3\S3Client;
+use Aws\Credentials\Credentials;
+use Aws\S3\Exception\S3Exception;
 
 class MidiaController extends Controller
 {
     private $response;
     private $client;
+    private $midia;
 
     public function __construct()
     {
         $this->response = new Response();
         $this->client = new Client();
+        $this->midia = new Midia();
     }
 
     /**
@@ -25,24 +30,7 @@ class MidiaController extends Controller
      */
     public function index(Request $request)
     {
-        $userLogged = $this->pageService->getAuthUser($request);
-        if($userLogged->user_type != "U")
-        {
-            $client = $this->client->getClientByUser($userLogged->id);
-            $pages = $this->page->getPagesByIdUser($client->id);      
-            
-            $this->response->setDataSet("Page", $pages);
-            $this->response->setType("S");
-            $this->response->setMessages("Sucess!");
-        }
         
-        else 
-        {
-            $this->response->setType("N");
-            $this->response->setMessages("Error!");
-        }
-        
-        return response()->json($this->response->toString());
     }
 
     /**
@@ -61,77 +49,45 @@ class MidiaController extends Controller
      */
     public function store(Request $request)
     {
-        // if ($request->get('client_id'))
-        // {
-        //     $clientID = $request->get('client_id');
-        // }
-        // else
-        // {
-        //     $userLogged = $this->pageService->getAuthUser($request);
-        //     $client = $this->client->getClientByUser($userLogged->id);
-        //     $clientID = $client->id;
-        // }
+        $s3 = new S3Client([
+            'version' => 'latest',
+            'region'  => 'us-east-1',
+            'credentials' => array(
+                'key' => env('AWS_KEY'),
+                'secret'  => env('AWS_SECRET')
+              )
+        ]);
 
-        // if($clientID != "" || $userLogged->user_type != "D")
-        // {
-        //     if($client)
-        //     {
+        $bucket = 'midia-site2go';
+        $keyname = '1/robots.txt2';
+        $filepath = getcwd().'/robots.txt';
 
-                $bucket = 'elasticbeanstalk-us-east-1-761736504383';
-                $keyname = '*** Your Object Key ***';
+        try {
+            $result = $s3->putObject(array(
+                'Bucket' => $bucket,
+                'Key'    => $keyname,
+                'SourceFile' => $filepath,
+                'Body'   => '',
+                'ACL'    => 'public-read'
+            ));
 
-                // $filepath should be absolute path to a file on disk						
-                $filepath = getcwd().'/index.php';
+            $returnMidia = $this->midia->create([
+                'client_id' => 2,
+                'url' => $result['ObjectURL'],
+                'keyname' => $keyname
+            ]);
+    
+            $this->response->setType("S");
+            $this->response->setDataSet("midia", $returnMidia);
+            $this->response->setMessages("Created midia successfully!");
 
-                // Instantiate the client.
-                $s3 = new S3Client([
-                    'version' => 'latest',
-                    'region'  => 'us-east-1'
-                ]);
+        } catch (S3Exception $e) {
+            $this->response->setType("N");
+            $this->response->setMessages("Failed to create a midia!");
+            return response()->json($this->response->toString(), 200);
+        }
 
-                $result = $s3->listBuckets();
-                foreach ($result['Buckets'] as $bucket) {
-                    echo $bucket['Name'] . "\n";
-                }
-                $array = $result->toArray();
-                var_dump($array);die;
-
-
-                // Upload a file.
-                $result = $s3->putObject(array(
-                    'Bucket' => $bucket,
-                    'Key' => $keyname,
-                    'SourceFile' => $filepath,
-                    'ContentType' => 'text/plain',
-                    'ACL' => 'public-read',
-                    'StorageClass' => 'REDUCED_REDUNDANCY',
-                    'Metadata' => array(    
-                        'param1' => 'value 1',
-                        'param2' => 'value 2'
-                    )
-                ));
-
-                echo $result['ObjectURL'];
-
-
-
-                $this->response->setDataSet("Page", $pageCreate);
-                $this->response->setType("S");
-        //         $this->response->setMessages("Page created!");
-        //     }
-        //     else 
-        //     {
-        //         $this->response->setType("N");
-        //         $this->response->setMessages("You dont't have permission to create a page!");
-        //     }
-        // }
-        // else 
-        // {
-        //     $this->response->setType("N");
-        //     $this->response->setMessages("You dont't have permission to create a page!");
-        // }
-
-        return response()->json($this->response->toString());
+        return response()->json($this->response->toString(), 200);
     }
 
     /**
@@ -142,31 +98,7 @@ class MidiaController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $userLogged = $this->pageService->getAuthUser($request);
-        if($userLogged->user_type != "U")
-        {
-            $pages = $this->page->find($id);
-
-            if(!$pages)
-            {
-                $this->response->settype("N");
-                $this->response->setMessages("Record not find!");
-            }
-            else
-            {
-                $this->response->settype("S");
-                $this->response->setMessages("Record not find!");
-                $this->response->setDataSet("page", $pages);
-
-            }
-        }
-        else 
-        {
-            $this->response->settype("N");
-            $this->response->setMessages("User don't have permission!");
-        }
         
-        return response()->json($this->response->toString());
     }
 
     /**
