@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateMidiaTable extends Migration
+class CreateBillsreceivesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,18 @@ class CreateMidiaTable extends Migration
      */
     public function up()
     {
-        Schema::create('midias', function (Blueprint $table) {
+        Schema::create('billsreceives', function (Blueprint $table) {
             $table->increments('id');
-            
+
             $table->integer('client_id')->unsigned();
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
 
-            $table->string('url');
-            $table->string('keyname');
+            $table->double('amount');
+            $table->string('month_reference');
 
+            $table->dateTime('issue_date');
+            $table->dateTime('due_date');
+            $table->dateTime('payment_date')->nullable();
             $table->timestamps();
         });
     }
@@ -33,6 +36,6 @@ class CreateMidiaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('midias');
+        Schema::dropIfExists('billsreceives');
     }
 }

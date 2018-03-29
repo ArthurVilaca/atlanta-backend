@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateMidiaTable extends Migration
+class CreateRemittancesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,18 @@ class CreateMidiaTable extends Migration
      */
     public function up()
     {
-        Schema::create('midias', function (Blueprint $table) {
+        Schema::create('remittances', function (Blueprint $table) {
             $table->increments('id');
             
             $table->integer('client_id')->unsigned();
-            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
+            $table->foreign('client_id')->references('id')->on('clients');
 
-            $table->string('url');
-            $table->string('keyname');
+            $table->double('amount_total');
+            $table->string('month_reference');
+            $table->string('description');
 
+            $table->dateTime('due_date');
+            $table->dateTime('payment_date')->nullable();
             $table->timestamps();
         });
     }
@@ -33,6 +36,6 @@ class CreateMidiaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('midias');
+        Schema::dropIfExists('remittances');
     }
 }
