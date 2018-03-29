@@ -48,4 +48,9 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     //Rotas para buscar páginas de um client
     Route::get('page/client/{client_id}', 'PageController@pageClients');
     Route::post('page/client/{client_id}', 'PageController@newPageClients');
+
+    //Rotas de midia
+    // Route::resource('client', 'MidiaController');
 });
+
+Route::resource('midia', 'MidiaController');

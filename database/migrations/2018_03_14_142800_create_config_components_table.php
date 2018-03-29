@@ -28,6 +28,7 @@ class CreateConfigComponentsTable extends Migration
             $table->string('min_height')->nullable();
             $table->boolean('can_edit_background_image')->nullable();
             $table->boolean('can_edit_background_color')->nullable();
+            $table->string('background_image')->nullable();
 
             $table->integer('component_id')->unsigned();
             $table->foreign('component_id')->references('id')->on('components');
