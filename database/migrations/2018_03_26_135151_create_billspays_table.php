@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class BillsToPayAndReceive extends Migration
+class CreateBillspaysTable extends Migration
 {
     /**
      * Run the migrations.
@@ -17,7 +17,7 @@ class BillsToPayAndReceive extends Migration
             $table->increments('id');
 
             $table->integer('dealer_id')->unsigned();
-            $table->foreign('dealer_id')->references('id')->on('dealers');
+            $table->foreign('dealer_id')->references('id')->on('dealers')->onDelete('cascade');
 
             $table->double('amount');
             $table->string('month_reference');
@@ -26,21 +26,6 @@ class BillsToPayAndReceive extends Migration
             $table->dateTime('due_date');
             $table->dateTime('payment_date')->nullable();
 
-            $table->timestamps();
-        });
-
-        Schema::create('billsreceives', function (Blueprint $table) {
-            $table->increments('id');
-
-            $table->integer('client_id')->unsigned();
-            $table->foreign('client_id')->references('id')->on('clients');
-
-            $table->double('amount');
-            $table->string('month_reference');
-
-            $table->dateTime('issue_date');
-            $table->dateTime('due_date');
-            $table->dateTime('payment_date')->nullable();
             $table->timestamps();
         });
     }
@@ -52,7 +37,6 @@ class BillsToPayAndReceive extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('billspay');
-        Schema::dropIfExists('billsreceive');
+        Schema::dropIfExists('billspays');
     }
 }

@@ -32,7 +32,6 @@ class Client extends Model
     public function getClientByUser($userID)
     {
         $client = DB::table('clients')->where('user_id', $userID)->first();
-
         return $client;
     }
 }

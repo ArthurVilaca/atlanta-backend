@@ -18,6 +18,7 @@ class ConfigComponent extends Model
         'image2',
         'image3',
         'background_color',
+        'background_image',
         'min_height',
         'can_edit_background_image',
         'can_edit_background_color',

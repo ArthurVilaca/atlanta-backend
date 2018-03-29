@@ -54,4 +54,9 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 
     //Rotas para contas a receber
     Route::resource('billsreceive', 'BillsreceiveController');
+    
+    //Rotas de midia
+    // Route::resource('client', 'MidiaController');
 });
+
+Route::resource('midia', 'MidiaController');
