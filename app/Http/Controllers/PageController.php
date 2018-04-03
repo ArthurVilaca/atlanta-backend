@@ -8,6 +8,7 @@ use \App\Response\Response;
 use \App\Service\PageService;
 use \App\Service\ComponentService;
 use \App\Client;
+use App\Component;
 use App\ConfigComponent;
 
 class PageController extends Controller
@@ -18,6 +19,8 @@ class PageController extends Controller
     private $page;
     private $pageService;
     private $componentService;
+    private $component;
+    private $configComponent;
 
     public function __construct()
     {
@@ -26,6 +29,7 @@ class PageController extends Controller
         $this->client = new Client();
         $this->pageService = new PageService();
         $this->page = new Page();
+        $this->component = new Component();
         $this->configComponent = new ConfigComponent();
 
         $this->pageService = new PageService();
@@ -157,6 +161,17 @@ class PageController extends Controller
                 $this->response->setDataSet("Page", $pageCreate);
                 $this->response->setType("S");
                 $this->response->setMessages("Page created!");
+
+                if ($request->get('page')) {
+                    $components = $request->get('page')['components'];
+                    foreach ($components as $key => $value) {
+
+                        $createComponent = $this->componentService->createComponentByArray($value['configs']);
+                        $createPageComponent = $this->componentService->createConfigComponentByArray($value['configs'], $createComponent->id);
+                        $createPageComponent = $this->pageService->createComponentPage($createComponent->id, $pageCreate->id);
+                    }
+                }
+
             }
             else 
             {

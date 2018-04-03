@@ -44,7 +44,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('page/{page}/components', 'PageController@componentsPage');
     Route::post('page/{page}/components', 'PageController@storeComponentPage');
     Route::put('page/{page}/components/{component}', 'PageController@updateComponentPage');
-    
+
     //Rotas para buscar páginas de um client
     Route::get('page/client/{client_id}', 'PageController@pageClients');
     Route::post('page/client/{client_id}', 'PageController@newPageClients');
@@ -54,9 +54,8 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 
     //Rotas para contas a receber
     Route::resource('billsreceive', 'BillsreceiveController');
-    
-    //Rotas de midia
-    // Route::resource('client', 'MidiaController');
-});
 
-Route::resource('midia', 'MidiaController');
+    //Rotas de midia
+    Route::resource('midia', 'MidiaController');
+    Route::resource('client/{client_id}/midia', 'MidiaController');
+});
