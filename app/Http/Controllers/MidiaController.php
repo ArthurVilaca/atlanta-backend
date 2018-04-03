@@ -34,9 +34,13 @@ class MidiaController extends Controller
      */
     public function index(Request $request)
     {
-        $user = $this->userService->getAuthUser($request);
-        $client = $this->client->getClientByUser($user->id);
-        $midias = $this->midia->getByClientId($client->id);
+        if ($request->get('client_id')) {
+            $midias = $this->midia->getByClientId($request->get('client_id'));
+        } else {
+            $user = $this->userService->getAuthUser($request);
+            $client = $this->client->getClientByUser($user->id);
+            $midias = $this->midia->getByClientId($client->id);
+        }
 
         $this->response->setType("S");
         $this->response->setDataSet("midias", $midias);
@@ -60,7 +64,14 @@ class MidiaController extends Controller
      */
     public function store(Request $request)
     {
-        $user = $this->userService->getAuthUser($request);
+
+        if ($request->get('client_id')) {
+            $client = $this->client->find($request->get('client_id'));
+        } else {
+            $user = $this->userService->getAuthUser($request);
+            $client = $this->client->getClientByUser($user->id);
+        }
+
 
         if($request->hasFile('midia')) {
             $file = $request->midia;
@@ -78,8 +89,6 @@ class MidiaController extends Controller
                 'secret'  => env('AWS_SECRET')
               )
         ]);
-
-        $client = $this->client->getClientByUser($user->id);
 
         $bucket = 'midia-site2go';
         $keyname = $client->id . '/' . $file->getClientOriginalName();
