@@ -166,27 +166,8 @@ class PageController extends Controller
                     $components = $request->get('page')['components'];
                     foreach ($components as $key => $value) {
 
-                        $createComponent = $this->component->create([
-                            'name' => $value['configs']['name'],
-                            'label' => $value['configs']['label'],
-                        ]);
-
-                        $createPageComponent = $this->configComponent->create([
-                            'name_config' => (isset($value['configs']['name_config'])) ? $value['configs']['name_config'] : '',
-                            'text1' => (isset($value['configs']['text1'])) ? $value['configs']['text1'] : '',
-                            'text2' => (isset($value['configs']['text2'])) ? $value['configs']['text2'] : '',
-                            'text3' => (isset($value['configs']['text3'])) ? $value['configs']['text3'] : '',
-                            'text4' => (isset($value['configs']['text4'])) ? $value['configs']['text4'] : '',
-                            'text5' => (isset($value['configs']['text5'])) ? $value['configs']['text5'] : '',
-                            'image1' => (isset($value['configs']['image1'])) ? $value['configs']['image1'] : '',
-                            'image2' => (isset($value['configs']['image2'])) ? $value['configs']['image2'] : '',
-                            'image3' => (isset($value['configs']['image3'])) ? $value['configs']['image3'] : '',
-                            'background_color' => (isset($value['configs']['background_color'])) ? $value['configs']['background_color'] : '',
-                            'min_height' => (isset($value['configs']['min_height'])) ? $value['configs']['min_height'] : '',
-                            'can_edit_background_image' => (isset($value['configs']['can_edit_background_image'])) ? $value['configs']['can_edit_background_image'] : '',
-                            'can_edit_background_color' => (isset($value['configs']['can_edit_background_color'])) ? $value['configs']['can_edit_background_color'] : '',
-                            'component_id' => $createComponent->id,
-                        ]);
+                        $createComponent = $this->componentService->createComponentByArray($value['configs']);
+                        $createPageComponent = $this->componentService->createConfigComponentByArray($value['configs'], $createComponent->id);
                         $createPageComponent = $this->pageService->createComponentPage($createComponent->id, $pageCreate->id);
                     }
                 }
