@@ -59,3 +59,5 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::resource('midia', 'MidiaController');
     Route::resource('client/{client_id}/midia', 'MidiaController');
 });
+
+Route::resource('container', 'ContainerController');
