@@ -109,6 +109,16 @@ class PageController extends Controller
                 $this->response->setDataSet("Page", $pageCreate);
                 $this->response->setType("S");
                 $this->response->setMessages("Page created!");
+
+                if ($request->get('page')) {
+                    $components = $request->get('page')['components'];
+                    foreach ($components as $key => $value) {
+
+                        $createComponent = $this->componentService->createComponentByArray($value['configs']);
+                        $createPageComponent = $this->componentService->createConfigComponentByArray($value['configs'], $createComponent->id);
+                        $createPageComponent = $this->pageService->createComponentPage($createComponent->id, $pageCreate->id);
+                    }
+                }
             }
             else 
             {

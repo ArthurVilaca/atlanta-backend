@@ -54,4 +54,11 @@ class Page extends Model
 
         return $configComponent;
     }
+
+    public function findPageByDealer($id) {
+        $page = DB::table('pages')
+            ->where('dealers_id', $id)
+            ->first();
+        return $page;
+    }
 }

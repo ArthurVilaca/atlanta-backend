@@ -24,8 +24,35 @@ class CreatePlans extends Migration
         });
 
         Schema::table('clients', function (Blueprint $table) {
-            $table->integer('plans_id')->unsigned();
+            $table->integer('plans_id')->nullable()->unsigned();
             $table->foreign('plans_id')->references('id')->on('plans');
+        });
+
+        Schema::table('pages', function (Blueprint $table) {
+            $table->integer('dealers_id')->nullable()->unsigned();
+            $table->foreign('dealers_id')->references('id')->on('dealers');
+        });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
+            $table->string('cpf')->nullable();
+            $table->string('cnpj')->nullable();
+            $table->dateTime('birthdate')->nullable();
+
+            $table->string('adress')->nullable();
+            $table->string('adress_number')->nullable();
+            $table->string('adress_complement')->nullable();
+            $table->string('adress_district')->nullable();
+            $table->string('zip_code')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+        });
+
+        Schema::table('dealers', function (Blueprint $table) {
+            $table->string('bank')->nullable();
+            $table->string('agency')->nullable();
+            $table->string('account')->nullable();
         });
 
         Schema::create('clusters', function (Blueprint $table) {

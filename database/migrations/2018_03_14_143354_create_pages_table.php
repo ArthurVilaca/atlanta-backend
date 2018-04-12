@@ -19,7 +19,7 @@ class CreatePagesTable extends Migration
             $table->string('url')->nullable();
             $table->string('file')->nullable();
             $table->enum('status', ['published', 'canceled'])->nullable();
-            $table->integer('client_id')->unsigned();
+            $table->integer('client_id')->nullable()->unsigned();
             $table->foreign('client_id')->references('id')->on('clients');
 
             $table->timestamps();
