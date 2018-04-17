@@ -58,4 +58,11 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     //Rotas de midia
     Route::resource('midia', 'MidiaController');
     Route::resource('client/{client_id}/midia', 'MidiaController');
+
+    //Rota para trazer o componente da pagina do revendedor
+    Route::get('dealerPage/components', 'DealerPageController@dealerComponentsPage');
+    Route::post('dealerPage/components', 'DealerPageController@dealerStoreComponentPage');
+    Route::put('dealerPage/components/{component}', 'DealerPageController@dealerUpdateComponentPage');
 });
+
+Route::resource('container', 'ContainerController');
