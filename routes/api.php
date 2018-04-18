@@ -66,3 +66,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 });
 
 Route::resource('container', 'ContainerController');
+
+App::missing(function($exception) {
+    return File::get(public_path() . '/public/index.html');
+});
