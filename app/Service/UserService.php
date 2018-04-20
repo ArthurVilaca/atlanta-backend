@@ -32,5 +32,17 @@ class UserService extends Service
 
         return $returnUser;
     }
+
+    public function findUserByEmail(Request $request)
+    {
+        $returnUser = $this->user->findUserByEmail($request->get('email'));
+        return $returnUser;
+    }
+
+    public function findUserByToken(Request $request)
+    {
+        $returnUser = $this->user->findUserByToken($request->get('token'));
+        return $returnUser;
+    }
 }
 ?>

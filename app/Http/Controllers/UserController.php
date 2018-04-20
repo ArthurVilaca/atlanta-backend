@@ -9,17 +9,21 @@ use JWTAuthException;
 use \App\Response\Response;
 use \App\Service\UserService;
 
+use App\Http\Controllers\EmailsController;
+
 class UserController extends Controller
 {
     private $user;
     private $userService;
     private $response;
-    
-    public function __construct()
+    private $emailsController;
+
+    public function __construct(EmailsController $emailsController)
     {
         $this->user = new User();
         $this->response = new Response();
         $this->userService = new UserService();
+        $this->emailsController = $emailsController;
     }
     /**
      * Display a listing of the resource.
@@ -173,5 +177,63 @@ class UserController extends Controller
         }
 
         $user->delete();
+    }
+
+    /**
+     * forgot password user
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function forgotPassword(Request $request)
+    {
+        $userObject = $this->userService->findUserByEmail($request);
+        if(!$userObject) {
+            $this->response->setType("N");    
+            $this->response->setMessages("Usuario não encontrado");
+            return response()->json($this->response->toString(), 500);
+        }
+
+        $user = $this->user->find($userObject->id);
+        $user->token = md5($user->username . date('Y-m-d'));
+        $user->save();
+        $this->emailsController->send('Ola: ' . $user->name . ' <br>Para cadastrar uma nova senha, clique <a href="http://localhost:3000/#/resetarminhasenha/' . $user->token . '">Aqui</a>!<br>Atenciosamente, Httplay',
+            $request->get('email'),
+            '[HTTPLAY] - Esqueci minha senha'
+        );
+
+        $this->response->setType("S");
+        $this->response->setMessages("Email enviado com sucesso!");
+
+        return response()->json($this->response->toString(), 200);
+    }
+
+    /**
+     * reset password user
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function resetPassword(Request $request)
+    {
+        $userObject = $this->userService->findUserByToken($request);
+        if(!$userObject) {
+            $this->response->setType("N");    
+            $this->response->setMessages("Usuario não encontrado");
+            return response()->json($this->response->toString(), 500);
+        }
+
+        $user = $this->user->find($userObject->id);
+        if($userObject->token !== $request->get('token')) {
+            $this->response->setType("N");    
+            $this->response->setMessages("Dados Invalidos!");
+            return response()->json($this->response->toString(), 500);
+        }
+
+        $user->password = bcrypt($request->get('password'));
+        $user->save();
+
+        $this->response->setType("S");
+        $this->response->setMessages("Alteração realizada com sucesso!");
+
+        return response()->json($this->response->toString(), 200);
     }
 }

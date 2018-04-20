@@ -11,6 +11,8 @@ use \App\Response\Response;
 use \App\Service\UserService;
 use \App\Service\DealerService;
 
+use App\Http\Controllers\EmailsController;
+
 class DealerController extends Controller
 {
     private $dealer;
@@ -18,14 +20,16 @@ class DealerController extends Controller
     private $user;
     private $userService;
     private $dealerService;
+    private $emailsController;
     
-    public function __construct()
+    public function __construct(EmailsController $emailsController)
     {
         $this->dealer = new Dealer();
         $this->user = new User();
         $this->response = new Response();
         $this->dealerService = new DealerService();
         $this->userService = new UserService();
+        $this->emailsController = $emailsController;
     }
     /**
      * Display a listing of the resource.
