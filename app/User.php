@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use DB;
 
 class User extends Authenticatable
 {
@@ -15,11 +16,19 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'id', 
         'username', 
         'name', 
         'password', 
         'user_type', 
+        'phone',
+        'email',
+        'adress',
+        'adress_number',
+        'adress_complement',
+        'adress_district',
+        'zip_code',
+        'city',
+        'state',
     ];
 
     /**
@@ -37,5 +46,19 @@ class User extends Authenticatable
     public function dealer()
     {
         return $this->hasOne('App\Dealer', 'user_id', 'id');
+    }
+
+    public function findUserByEmail($email) {
+        $user = DB::table('users')
+            ->where('email', $email)
+            ->first();
+        return $user;
+    }
+
+    public function findUserByToken($token) {
+        $user = DB::table('users')
+            ->where('token', $token)
+            ->first();
+        return $user;
     }
 }

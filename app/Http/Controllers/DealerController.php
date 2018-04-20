@@ -11,6 +11,8 @@ use \App\Response\Response;
 use \App\Service\UserService;
 use \App\Service\DealerService;
 
+use App\Http\Controllers\EmailsController;
+
 class DealerController extends Controller
 {
     private $dealer;
@@ -18,14 +20,16 @@ class DealerController extends Controller
     private $user;
     private $userService;
     private $dealerService;
+    private $emailsController;
     
-    public function __construct()
+    public function __construct(EmailsController $emailsController)
     {
         $this->dealer = new Dealer();
         $this->user = new User();
         $this->response = new Response();
         $this->dealerService = new DealerService();
         $this->userService = new UserService();
+        $this->emailsController = $emailsController;
     }
     /**
      * Display a listing of the resource.
@@ -66,6 +70,7 @@ class DealerController extends Controller
     {
         $returnUser = $this->userService->create($request);
         $returnDealer = $this->dealerService->create($request, $returnUser->id);
+        $this->emailsController->send('Bem Vindo ao Httplay<br>Voce recebera um email quando o seu cadastro for liberado!', $request->get('email'), '[HTTPLAY] - Confirmação de cadastro');
 
         $this->response->setType("S");
         $this->response->setDataSet("user", $returnUser);

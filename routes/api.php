@@ -20,6 +20,8 @@ Route::get('/', function() {
 Route::post('/dealer', 'DealerController@store');
 Route::post('/register', 'UserController@store');
 Route::post('/login', 'UserController@login');
+Route::post('/forgotPassword', 'UserController@forgotPassword');
+Route::post('/resetPassword', 'UserController@resetPassword');
 
 Route::group(['middleware' => 'jwt.auth'], function () {
     //Rotas de usuario
