@@ -60,7 +60,7 @@ class PaymentController extends Controller
             $environment = $environment = Environment::sandbox();
 
             // Configure seu merchant
-            $merchant = new Merchant('MID', 'MKEY');
+            $merchant = new Merchant(env('CIELO_MERCHANT_ID'), env('CIELO_MERCHANT_KEY'));
 
             // Crie uma instância de Sale informando o ID do pedido na loja
             $sale = new Sale('123');
@@ -69,7 +69,7 @@ class PaymentController extends Controller
             $customer = $sale->customer('Fulano de Tal');
 
             // Crie uma instância de Payment informando o valor do pagamento
-            $payment = $sale->payment(15700);
+            $payment = $sale->payment(68.9);
 
             // Crie uma instância de Credit Card utilizando os dados de teste
             // esses dados estão disponíveis no manual de integração

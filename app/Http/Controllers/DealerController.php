@@ -66,6 +66,7 @@ class DealerController extends Controller
     {
         $returnUser = $this->userService->create($request);
         $returnDealer = $this->dealerService->create($request, $returnUser->id);
+        $this->emailsController->send('Bem Vindo ao Httplay<br>Voce recebera um email quando o seu cadastro for liberado!', $request->get('email'), '[HTTPLAY] - Confirmação de cadastro');
 
         $this->response->setType("S");
         $this->response->setDataSet("user", $returnUser);

@@ -11,20 +11,24 @@ use \App\Response\Response;
 use \App\Service\UserService;
 use \App\Service\ClientService;
 
+use App\Http\Controllers\EmailsController;
+
 class ClientController extends Controller
 {
     private $client;
     private $response;
     private $userService;
     private $clientService;
+    private $emailsController;
 
-    public function __construct()
+    public function __construct(EmailsController $emailsController)
     {
         $this->client = new Client();
         $this->user = new User();
         $this->response = new Response();
         $this->userService = new UserService();
         $this->clientService = new ClientService();
+        $this->emailsController = $emailsController;
     }
     /**
      * Display a listing of the resource.
@@ -45,6 +49,9 @@ class ClientController extends Controller
             if($dealer)
             {
                 $client = $this->client->getClientByDealer($dealer->id);
+                foreach ($client as $key => $value) {
+                    $value->user = $this->user->find($value->user_id);
+                }
             }
         }
         
@@ -84,7 +91,8 @@ class ClientController extends Controller
                 $returnUser = $this->userService->create($request);
         
                 $returnClient = $this->clientService->create($request, $returnUser->id, $dealer->id);
-        
+                $this->emailsController->send('Bem Vindo ao Httplay', $request->get('email'), '[HTTPLAY] - Confirmação de cadastro');
+
                 $this->response->setType("S");
                 $this->response->setDataSet("user", $returnUser);
                 $this->response->setDataSet("client", $returnClient);
@@ -164,10 +172,13 @@ class ClientController extends Controller
             return response()->json($this->response->toString(), 404);
         }
 
-        $client->fill($request->all());
+        $user_data = $request->all();
+        
+        $client->fill($user_data);
         $client->save();
-
-        $user->fill($request->all());
+        
+        $user_data['id'] = $user_data['user_id'];
+        $user->fill($user_data);
         $user->save();
 
         $this->response->setType("S");
