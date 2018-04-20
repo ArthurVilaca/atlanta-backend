@@ -63,6 +63,9 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('dealerPage/components', 'DealerPageController@dealerComponentsPage');
     Route::post('dealerPage/components', 'DealerPageController@dealerStoreComponentPage');
     Route::put('dealerPage/components/{component}', 'DealerPageController@dealerUpdateComponentPage');
+
+    //Rotas para contas a receber
+    Route::resource('payment', 'PaymentController');
 });
 
 Route::resource('container', 'ContainerController');
