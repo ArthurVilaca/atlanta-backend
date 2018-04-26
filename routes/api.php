@@ -70,4 +70,4 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::resource('payment', 'PaymentController');
 });
 
-Route::resource('container', 'ContainerController');
+Route::resource('publish', 'PublishController');
