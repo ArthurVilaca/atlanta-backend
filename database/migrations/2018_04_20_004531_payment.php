@@ -21,10 +21,12 @@ class Payment extends Migration
 
             $table->double('amount');
             $table->string('month_reference');
+            $table->string('paymentId');
+            $table->string('status');
+            $table->string('returnMessage');
+            $table->string('card_number');
 
             $table->dateTime('issue_date');
-            $table->dateTime('due_date');
-            $table->dateTime('payment_date')->nullable();
             $table->timestamps();
         });
 

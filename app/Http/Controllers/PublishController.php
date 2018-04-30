@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use JWTAuthException;
 use JWTAuth;
 use \App\Response\Response;
-use \App\Service\ContainerService;
 
 use Aws\S3\S3Client;
 use Aws\Credentials\Credentials;
@@ -15,13 +14,11 @@ use Aws\Route53\Route53Client;
 
 class PublishController extends Controller
 {
-    private $containerService;
     private $response;
     
     public function __construct()
     {
         $this->response = new Response();
-        $this->containerService = new ContainerService();
     }
     /**
      * Display a listing of the resource.

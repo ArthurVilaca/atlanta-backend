@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use JWTAuthException;
+use JWTAuth;
 use \App\Response\Response;
+
 use App\Client;
-use App\Midia;
+use App\Payments;
 use \App\Service\UserService;
+use \App\Service\PaymentService;
 
 use Cielo\API30\Merchant;
 use Cielo\API30\Ecommerce\Environment;
@@ -15,18 +19,25 @@ use Cielo\API30\Ecommerce\CieloEcommerce;
 use Cielo\API30\Ecommerce\Payment;
 use Cielo\API30\Ecommerce\CreditCard;
 use Cielo\API30\Ecommerce\Request\CieloRequestException;
+use Cielo\API30\Ecommerce\RecurrentPayment;
+
+use App\Http\Controllers\EmailsController;
 
 class PaymentController extends Controller
 {
     private $response;
     private $client;
     private $userService;
+    private $paymentService;
+    private $emailsController;
 
-    public function __construct()
+    public function __construct(EmailsController $emailsController)
     {
         $this->response = new Response();
         $this->client = new Client();
         $this->userService = new UserService();
+        $this->paymentService = new PaymentService();
+        $this->emailsController = $emailsController;
     }
 
     /**
@@ -54,7 +65,7 @@ class PaymentController extends Controller
     public function store(Request $request)
     {
         try {
-            $userLogged = $this->pageService->getAuthUser($request);
+            $userLogged = $this->userService->getAuthUser($request);
 
             // Configure o ambiente
             $environment = $environment = Environment::sandbox();
@@ -63,21 +74,23 @@ class PaymentController extends Controller
             $merchant = new Merchant(env('CIELO_MERCHANT_ID'), env('CIELO_MERCHANT_KEY'));
 
             // Crie uma instância de Sale informando o ID do pedido na loja
-            $sale = new Sale('123');
+            $id = date('YmdHis');
+            $sale = new Sale($id);
 
             // Crie uma instância de Customer informando o nome do cliente
-            $customer = $sale->customer('Fulano de Tal');
+            $customer = $sale->customer($userLogged->name);
 
+            $amount = 68.9;
             // Crie uma instância de Payment informando o valor do pagamento
-            $payment = $sale->payment(68.9);
+            $payment = $sale->payment($amount);
 
             // Crie uma instância de Credit Card utilizando os dados de teste
             // esses dados estão disponíveis no manual de integração
             $payment->setType(Payment::PAYMENTTYPE_CREDITCARD)
-                    ->creditCard("123", CreditCard::VISA)
-                    ->setExpirationDate("12/2018")
-                    ->setCardNumber("0000000000000001")
-                    ->setHolder("Fulano de Tal");
+                    ->creditCard($request->get('cvv'), CreditCard::VISA)
+                    ->setExpirationDate($request->get('due_date'))
+                    ->setCardNumber(str_replace(" ", "", $request->get('card_number')))
+                    ->setHolder($request->get('name'));
 
             // Configure o pagamento recorrente
             $payment->recurrentPayment(true)->setInterval(RecurrentPayment::INTERVAL_MONTHLY);
@@ -87,25 +100,46 @@ class PaymentController extends Controller
                 // Configure o SDK com seu merchant e o ambiente apropriado para criar a venda
                 $sale = (new CieloEcommerce($merchant, $environment))->createSale($sale);
 
+                $paymentId = $sale->getPayment()->getPaymentId();
+                $status = $sale->getPayment()->getStatus();
+                $returnMessage = $sale->getPayment()->getReturnMessage();
                 $recurrentPaymentId = $sale->getPayment()->getRecurrentPayment()->getRecurrentPaymentId();
+                $nextRecurrency = $sale->getPayment()->getRecurrentPayment()->getNextRecurrency();
+                $cardNumber = $sale->getPayment()->getCreditCard()->getCardNumber();
+
+                $payment = $this->paymentService->create($amount, date('Y-m'), $paymentId, $status, $returnMessage, $cardNumber, new \DateTime(), $userLogged->id);
+
+                if($status != 1) {
+                    $this->response->setType("N");
+                    $this->response->setMessages("Falha para processar o pagamento!");
+                    return response()->json($this->response->toString(), 200);
+                } else {
+                    $this->emailsController->send(
+                        '<br>Ola,<br>Pagamento recebido com sucesso no cartão: '.$cardNumber.'<br>Valor: R$ 68,90<br>Proxima cobrança: '.(new \DateTime($nextRecurrency))->format('d/m/Y').'<br>Att<br>Equipe Httplay',
+                        $userLogged->email,
+                        '[HTTPLAY] - Confirmação de pagamento'
+                    );
+
+                    $this->response->setType("S");
+                    $this->response->setMessages("Pagamento processado com sucesso!");
+                    return response()->json($this->response->toString(), 200);
+                }
+
             } catch (CieloRequestException $e) {
                 // Em caso de erros de integração, podemos tratar o erro aqui.
                 // os códigos de erro estão todos disponíveis no manual de integração.
                 $error = $e->getCieloError();
+
+                $this->response->setType("N");
+                $this->response->setMessages("Falha para processar o pagamento!");
+                return response()->json($this->response->toString(), 200);
             }
 
-    
-            $this->response->setType("S");
-            // $this->response->setDataSet("midia", $returnMidia);
-            $this->response->setMessages("Pagamento realizado com sucesso!");
-
-        } catch (S3Exception $e) {
+        } catch (Exception $e) {
             $this->response->setType("N");
-            $this->response->setMessages("Failed to create a midia!");
+            $this->response->setMessages("Falha para processar o pagamento!");
             return response()->json($this->response->toString(), 200);
         }
-
-        return response()->json($this->response->toString(), 200);
     }
 
     /**
